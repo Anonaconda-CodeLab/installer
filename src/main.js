@@ -343,24 +343,43 @@ $("file-other").addEventListener("change", async (event) => {
     spellcheck: false,
     placeholder: "Paste the SHA-256 from the publisher's site",
   });
+  const consent = h("input", { type: "checkbox", id: "consent" });
+  consent.addEventListener("change", () => {
+    if (state.selection?.file === checked.file) state.selection.trusted = consent.checked;
+    refresh();
+  });
+
+  // A pasted checksum that doesn't match blocks the install outright.
+  function setBlocked(blocked) {
+    consent.dataset.blocked = String(blocked);
+    consent.disabled = blocked || state.installing;
+    if (blocked && consent.checked) {
+      consent.checked = false;
+      if (state.selection?.file === checked.file) state.selection.trusted = false;
+    }
+    refresh();
+  }
+
   compareInput.addEventListener("input", () => {
     const pasted = normaliseChecksum(compareInput.value);
     if (!pasted) {
       compareResult.textContent = "";
       compareResult.className = "compare-result";
+      setBlocked(false);
+    } else if (!/^[0-9a-f]{64}$/.test(pasted)) {
+      compareResult.textContent = "That isn't a complete SHA-256. It should be 64 letters and numbers.";
+      compareResult.className = "compare-result";
+      setBlocked(false);
     } else if (pasted === checked.sha256) {
       compareResult.textContent = "Match. This is the same file the publisher lists.";
       compareResult.className = "compare-result match";
+      setBlocked(false);
     } else {
-      compareResult.textContent = "No match. This file is different from the one the publisher lists. Don't install it.";
+      compareResult.textContent =
+        "No match. This file is different from the one the publisher lists, so it can't be installed. Download it again from the publisher's own site.";
       compareResult.className = "compare-result nomatch";
+      setBlocked(true);
     }
-  });
-
-  const consent = h("input", { type: "checkbox", id: "consent" });
-  consent.addEventListener("change", () => {
-    if (state.selection?.file === checked.file) state.selection.trusted = consent.checked;
-    refresh();
   });
 
   show(
@@ -377,7 +396,11 @@ $("file-other").addEventListener("change", async (event) => {
       "label",
       { class: "consent", for: "consent" },
       consent,
-      h("span", {}, "I trust the publisher and got this file from them. I understand Anonaconda Code Lab can't check it."),
+      h(
+        "span",
+        {},
+        "I got this file from a publisher I trust, and I've checked its checksum where they publish one. I understand that apps not made by Anonaconda Code Lab haven't been checked by us, and that a harmful app could access my data or misuse the permissions I give it.",
+      ),
     ),
   );
   refresh();
@@ -423,6 +446,11 @@ $("install").addEventListener("click", async () => {
     show(
       $("install-result"),
       notice("verified", `Installed ${label}`, `You'll find ${appName} in your phone's app list.`),
+      notice(
+        "caution",
+        "When you've finished installing, turn off Developer options",
+        "On the phone, go to Settings → System → Developer options and switch it off at the top. This also turns off USB debugging, so nothing can use the connection. Turn it back on the next time you install or update an app this way.",
+      ),
       h("button", { type: "button", class: "button secondary", onclick: () => clearSelection() }, "Install another app"),
     );
     $("install-summary").textContent = `Finished installing on ${phone.name}.`;
@@ -446,7 +474,7 @@ function setInputsLocked(locked) {
     $(id).disabled = locked || (id === "file-ours" && !hasAnyRelease()) || (id === "connect" && !webUsbSupported());
   }
   const consent = document.getElementById("consent");
-  if (consent) consent.disabled = locked;
+  if (consent) consent.disabled = locked || consent.dataset.blocked === "true";
 }
 
 window.addEventListener("beforeunload", (event) => {
