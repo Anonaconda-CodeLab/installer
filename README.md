@@ -69,6 +69,14 @@ releases: [
 and set `installPage`. Copy the SHA-256 from the tagged release, not from a
 local build.
 
+## Before publishing
+
+- [ ] Real releases, tags and SHA-256s for Lead One ECG, Rounds and Still Point in `src/apps.js`, each with `installPage` set
+- [ ] One-line description for Still Point
+- [ ] Phone-to-phone install: test it (Pixel as host), or soften the help answer to say it's untested
+- [ ] Choose hosting for install.anonacondacodelab.com and check the security headers are served
+- [ ] Screenshots reviewed before anything goes on the studio homepage
+
 ## Hosting
 
 `dist/` can go on any static host. `public/_headers` sets security headers on
