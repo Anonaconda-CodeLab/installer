@@ -131,7 +131,8 @@
 
       <details>
         <summary>Linux says access denied</summary>
-        <p>Your system needs Android udev rules so your user account can open the phone. Many distributions package them as <code>android-udev-rules</code> or <code>android-sdk-platform-tools-common</code>. Install them, then unplug and replug the phone.</p>
+        <p>Your system needs Android udev rules so your user account can open the phone. Fedora 42 and newer include them. On other distributions they're often packaged as <code>android-udev-rules</code> or <code>android-sdk-platform-tools-common</code>. Install them, then unplug and replug the phone.</p>
+        <p>If you use Chrome or Chromium as a Flatpak, it may not be allowed to see USB devices. Give it device access (for example with Flatseal), or use the version from your distribution's packages.</p>
       </details>
 
       <details>
