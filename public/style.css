@@ -238,9 +238,13 @@ body[data-installed] .cable-end-bottom .glyph { stroke: var(--verified); }
 
 .catalogue { list-style: none; padding: 0; margin: 0 0 1.1rem; border-top: 1px solid var(--line); }
 .catalogue li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.6rem 0; border-bottom: 1px solid var(--line); align-items: baseline; flex-wrap: wrap; }
-.catalogue .app-name { font-weight: 700; }
+.catalogue .app-name { font-weight: 700; flex: 1 1 14rem; min-width: 0; }
 .catalogue .app-blurb { color: var(--ink-soft); font-size: 0.95rem; display: block; font-weight: 400; }
 .catalogue .app-status { font-size: 0.9rem; color: var(--ink-soft); white-space: nowrap; }
+.catalogue .app-links { display: flex; gap: 1rem; align-items: baseline; flex-wrap: wrap; font-size: 0.9rem; white-space: nowrap; }
+.catalogue .app-download { font-weight: 700; }
+.catalogue .app-page { color: var(--ink-soft); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 .file-pick { display: inline-block; position: relative; margin-bottom: 1rem; }
 .file-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }

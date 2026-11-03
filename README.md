@@ -60,6 +60,8 @@ release, replace its entry:
 release: { version: "1.8.4", file: "LeadOne-ECG-1.8.4.apk", sha256: "…64 hex characters…" },
 ```
 
+The "Download" link is built from `repo`, the version and `file`
+(`…/releases/download/v<version>/<file>`), so the tag must be `v` + version.
 Copy the SHA-256 from the tagged release's `.sha256` file, not from a local
 build, and check the APK is signed with the studio certificate
 (`apksigner verify --print-certs`). A new app also needs `installPage` set.

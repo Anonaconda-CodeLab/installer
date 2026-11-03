@@ -4,7 +4,7 @@
 
 import { connectPhone, installApk, forgetKey, webUsbSupported } from "./adb.js";
 import { checkApkFile, sha256Hex, normaliseChecksum, formatSize, signingCertSha256s, formatFingerprint } from "./apk.js";
-import { OFFICIAL_APPS, findOfficialBuild, isStudioSigned, hasAnyRelease } from "./apps.js";
+import { OFFICIAL_APPS, findOfficialBuild, isStudioSigned, hasAnyRelease, downloadUrl } from "./apps.js";
 import { explainConnectError, explainInstallError } from "./errors.js";
 
 const $ = (id) => document.getElementById(id);
@@ -183,10 +183,22 @@ function renderCatalogue() {
   list.replaceChildren(
     ...OFFICIAL_APPS.map((app) => {
       const latest = app.release;
+      // Download in place: leaving this page would drop the phone's USB connection.
+      // The install page opens in a new tab for the same reason.
       const status = latest
-        ? app.installPage
-          ? h("a", { class: "app-status", href: app.installPage }, `Get version ${latest.version}`)
-          : h("span", { class: "app-status" }, `Version ${latest.version}`)
+        ? h(
+            "span",
+            { class: "app-links" },
+            h("a", { class: "app-download", href: downloadUrl(app) }, `Download ${latest.version}`),
+            app.installPage &&
+              h(
+                "a",
+                { class: "app-page", href: app.installPage, target: "_blank", rel: "noopener noreferrer" },
+                "Install page",
+                h("span", { "aria-hidden": "true" }, " ↗"),
+                h("span", { class: "visually-hidden" }, " (opens in a new tab)"),
+              ),
+          )
         : h("span", { class: "app-status" }, "Not released yet");
       return h(
         "li",

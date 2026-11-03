@@ -16,6 +16,8 @@ export const OFFICIAL_APPS = mock.officialSha
     )
   : real.OFFICIAL_APPS;
 
+export const downloadUrl = real.downloadUrl;
+
 export function findOfficialBuild(sha256) {
   const app = OFFICIAL_APPS.find((a) => a.release?.sha256 === sha256.toLowerCase());
   return app ? { app, release: app.release } : null;

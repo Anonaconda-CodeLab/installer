@@ -15,6 +15,7 @@ export const STUDIO_CERT_SHA256 = "4d6cea5894c0d7d8e9ab74bc3a1e9ca547bd40a202b67
 export const OFFICIAL_APPS = [
   {
     id: "lead-one-ecg",
+    repo: "lead-one-ecg", // github.com/Anonaconda-CodeLab/lead-one-ecg
     name: "Lead One ECG",
     blurb: "ECG recorder for the Polar H10 chest strap.",
     installPage: "https://leadone.anonacondacodelab.com/android.html",
@@ -26,6 +27,7 @@ export const OFFICIAL_APPS = [
   },
   {
     id: "rounds",
+    repo: "rounds", // github.com/Anonaconda-CodeLab/rounds
     name: "Rounds",
     blurb: "Workout interval timer.",
     installPage: "https://rounds.anonacondacodelab.com/android.html",
@@ -37,6 +39,7 @@ export const OFFICIAL_APPS = [
   },
   {
     id: "still-point",
+    repo: "still-point", // github.com/Anonaconda-CodeLab/still-point
     name: "Still Point",
     blurb: "Morning HRV, standing test and calm breathing with a chest strap.",
     installPage: "https://stillpoint.anonacondacodelab.com/android.html",
@@ -48,6 +51,7 @@ export const OFFICIAL_APPS = [
   },
   {
     id: "unmarked",
+    repo: "unmarked", // github.com/Anonaconda-CodeLab/unmarked
     name: "Unmarked",
     blurb: "Removes hidden data from photos and PDFs.",
     installPage: "https://unmarked.anonacondacodelab.com/android.html",
@@ -59,6 +63,7 @@ export const OFFICIAL_APPS = [
   },
   {
     id: "flatbed",
+    repo: "flatbed", // github.com/Anonaconda-CodeLab/flatbed
     name: "Flatbed",
     blurb: "Scans documents to clean, searchable PDFs.",
     installPage: "https://flatbed.anonacondacodelab.com/android.html",
@@ -69,6 +74,15 @@ export const OFFICIAL_APPS = [
     },
   },
 ];
+
+/**
+ * Direct download address of an app's latest APK on GitHub, from its tagged
+ * release (tag "v" + version). The page stays put while the file downloads.
+ */
+export function downloadUrl(app) {
+  const { version, file } = app.release;
+  return `https://github.com/Anonaconda-CodeLab/${app.repo}/releases/download/v${version}/${file}`;
+}
 
 /** Returns { app, release } when the SHA-256 is an app's latest release, or null. */
 export function findOfficialBuild(sha256) {
