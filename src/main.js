@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { connectPhone, installApk, forgetKey, webUsbSupported } from "./adb.js";
-import { checkApkFile, sha256Hex, normaliseChecksum, formatSize } from "./apk.js";
-import { OFFICIAL_APPS, findOfficialBuild, hasAnyRelease } from "./apps.js";
+import { checkApkFile, sha256Hex, normaliseChecksum, formatSize, signingCertSha256s, formatFingerprint } from "./apk.js";
+import { OFFICIAL_APPS, findOfficialBuild, isStudioSigned, hasAnyRelease } from "./apps.js";
 import { explainConnectError, explainInstallError } from "./errors.js";
 
 const $ = (id) => document.getElementById(id);
@@ -182,7 +182,7 @@ function renderCatalogue() {
   const list = $("catalogue");
   list.replaceChildren(
     ...OFFICIAL_APPS.map((app) => {
-      const latest = app.releases[app.releases.length - 1];
+      const latest = app.release;
       const status = latest
         ? app.installPage
           ? h("a", { class: "app-status", href: app.installPage }, `Get version ${latest.version}`)
@@ -238,7 +238,7 @@ function clearSelection() {
   refresh();
 }
 
-function fileFacts(file, sha256) {
+function fileFacts({ file, sha256, certs }) {
   return h(
     "dl",
     { class: "file-facts" },
@@ -246,6 +246,14 @@ function fileFacts(file, sha256) {
     h("dd", {}, `${file.name} (${formatSize(file.size)})`),
     h("dt", {}, "SHA-256"),
     h("dd", {}, h("code", { class: "checksum" }, sha256), copyButton(sha256)),
+    h("dt", {}, "Signing certificate"),
+    h(
+      "dd",
+      {},
+      certs
+        ? certs.map((c) => h("code", { class: "checksum" }, formatFingerprint(c)))
+        : "Not shown: this file uses an older signature format.",
+    ),
   );
 }
 
@@ -279,8 +287,14 @@ async function readFile(file, resultEl) {
     show(resultEl, notice("danger", problem.title, problem.detail));
     return null;
   }
-  const sha256 = await sha256Hex(file);
-  return { file, sha256, official: findOfficialBuild(sha256) };
+  const bytes = await file.arrayBuffer();
+  const sha256 = await sha256Hex(bytes);
+  const certs = await signingCertSha256s(bytes);
+  const studioSigned = isStudioSigned(certs);
+  const match = findOfficialBuild(sha256);
+  // Ours only if the checksum is a published release AND it carries our certificate.
+  const official = match && studioSigned ? match : null;
+  return { file, sha256, certs, studioSigned, official, checksumOnly: match && !studioSigned };
 }
 
 $("file-ours").addEventListener("change", async (event) => {
@@ -295,9 +309,29 @@ $("file-ours").addEventListener("change", async (event) => {
       notice(
         "verified",
         `Verified, official build: ${app.name} ${release.version}`,
-        "This file is exactly the one we published. Its checksum matches our release.",
+        "This file is exactly the one we published: its checksum matches our latest release and it's signed with our certificate.",
       ),
-      fileFacts(checked.file, checked.sha256),
+      fileFacts(checked),
+    );
+  } else if (checked.checksumOnly) {
+    show(
+      resultEl,
+      notice(
+        "danger",
+        "This file's signature doesn't match ours",
+        "Don't install it. Its checksum matches one of our releases, but it isn't signed with our certificate. Please tell us at hello@anonacondacodelab.com.",
+      ),
+      fileFacts(checked),
+    );
+  } else if (checked.studioSigned) {
+    show(
+      resultEl,
+      notice(
+        "caution",
+        "This isn't the latest release",
+        "It's signed with our certificate, but it isn't the current version of any of our apps. Download the latest version from the app's install page, listed above, and choose that file.",
+      ),
+      fileFacts(checked),
     );
   } else {
     show(
@@ -307,7 +341,7 @@ $("file-ours").addEventListener("change", async (event) => {
         "This file doesn't match any build we've published",
         "Don't install it. It may be damaged, out of date, or changed by someone else. Download it again from the app's own install page.",
       ),
-      fileFacts(checked.file, checked.sha256),
+      fileFacts(checked),
     );
   }
   refresh();
@@ -326,9 +360,9 @@ $("file-other").addEventListener("change", async (event) => {
       notice(
         "verified",
         `This is our app: ${app.name} ${release.version}`,
-        "Its checksum matches our published release, so it's an official build.",
+        "Its checksum matches our latest release and it's signed with our certificate, so it's an official build.",
       ),
-      fileFacts(checked.file, checked.sha256),
+      fileFacts(checked),
     );
     refresh();
     return;
@@ -384,7 +418,7 @@ $("file-other").addEventListener("change", async (event) => {
 
   show(
     resultEl,
-    fileFacts(checked.file, checked.sha256),
+    fileFacts(checked),
     h(
       "div",
       { class: "compare" },

@@ -72,7 +72,7 @@
         </div>
 
         <div class="panel" id="panel-ours" role="tabpanel" aria-labelledby="tab-ours">
-          <p>Download the app from its install page, then choose the file here. We check it's exactly the build we published before installing.</p>
+          <p>Download the app from its install page, then choose the file here. Before installing, we check it's exactly our latest release and that it's signed with our certificate.</p>
           <ul class="catalogue" id="catalogue"></ul>
           <label class="file-pick" id="ours-pick">
             <span class="button secondary">Choose the downloaded file</span>
@@ -147,7 +147,8 @@
 
       <details>
         <summary>Can I install from one phone to another?</summary>
-        <p>Often, yes. Open this page in Chrome on the first phone and connect it to the second phone with a USB-C to USB-C cable. The second phone needs USB debugging turned on, as in step 1. If the phones just charge each other, unplug the cable and plug it in the other way round, or change the USB setting from the notification shade on either phone. Not every phone supports this.</p>
+        <p>Often, yes. On the first phone, open this page in Chrome from its web address, install.anonacondacodelab.com. A copy of the page saved to the phone and opened from its storage can't use USB. Connect it to the second phone with a good USB-C to USB-C data cable: with a weak cable, the phones may charge but the page says “No devices found”. The second phone needs USB debugging turned on, as in step 1.</p>
+        <p>If the phones just charge each other, unplug the cable and plug it in the other way round, or change the USB setting from the notification shade on either phone. We've tested this with a GrapheneOS phone as the first phone, and its USB setting didn't need changing. Not every phone supports this.</p>
       </details>
 
       <details>

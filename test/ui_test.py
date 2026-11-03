@@ -7,6 +7,7 @@ Real-phone testing still has to be done by hand.
 """
 import hashlib
 import http.server
+import struct
 import socketserver
 import sys
 import tempfile
@@ -22,15 +23,41 @@ SHOTS = Path(sys.argv[1]) if len(sys.argv) > 1 else None
 TMP = Path(tempfile.mkdtemp())
 
 
-def make_apk(name, payload):
+def lp(data):
+    return struct.pack("<I", len(data)) + data
+
+
+def add_signing_block(data, cert):
+    """Inserts an APK Signature Scheme v2 block naming `cert` (not a real signature)."""
+    eocd = data.rindex(b"PK\x05\x06")
+    cd = struct.unpack_from("<I", data, eocd + 16)[0]
+    signed = lp(lp(b"digest")) + lp(lp(cert)) + lp(b"")
+    value = lp(lp(lp(signed) + lp(b"signatures") + lp(b"public key")))
+    pairs = struct.pack("<QI", len(value) + 4, 0x7109871A) + value
+    size = len(pairs) + 24
+    block = struct.pack("<Q", size) + pairs + struct.pack("<Q", size) + b"APK Sig Block 42"
+    out = bytearray(data[:cd] + block + data[cd:])
+    struct.pack_into("<I", out, eocd + len(block) + 16, cd + len(block))
+    return bytes(out)
+
+
+STUDIO_CERT = b"fake studio certificate"
+STUDIO_CERT_SHA = hashlib.sha256(STUDIO_CERT).hexdigest()
+
+
+def make_apk(name, payload, cert=None):
     path = TMP / name
     with zipfile.ZipFile(path, "w") as z:
         z.writestr("AndroidManifest.xml", payload)
+    if cert:
+        path.write_bytes(add_signing_block(path.read_bytes(), cert))
     return path, hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-OFFICIAL, OFFICIAL_SHA = make_apk("lead-one-ecg-1.0.0.apk", b"official" * 20000)
+OFFICIAL, OFFICIAL_SHA = make_apk("lead-one-ecg-1.0.0.apk", b"official" * 20000, STUDIO_CERT)
 TAMPERED, _ = make_apk("lead-one-ecg-1.0.0-modified.apk", b"tampered" * 20000)
+OLDER, _ = make_apk("lead-one-ecg-0.9.0.apk", b"older" * 20000, STUDIO_CERT)
+WRONG_KEY, WRONG_KEY_SHA = make_apk("lead-one-ecg-1.0.0-other-key.apk", b"official" * 20000, b"someone else")
 OTHER, OTHER_SHA = make_apk("some-other-app.apk", b"other" * 30000)
 NOT_APK = TMP / "holiday-photo.apk"
 NOT_APK.write_bytes(b"\xff\xd8\xff\xe0 not a zip")
@@ -88,11 +115,13 @@ def main():
         browser = p.chromium.launch()
         desktop = dict(viewport={"width": 1280, "height": 900})
 
-        # 1. Fresh page, no releases published (the real current state).
+        # 1. Fresh page with the real app list.
         page, errors = open_page(browser, url, "{}", **desktop)
         check("starts on step 1", step_state(page, "ready") == "current")
-        check("our-apps file picker disabled with no releases", page.locator("#file-ours").is_disabled())
-        check("shows 'not released yet' for all three apps", page.locator(".app-status", has_text="Not released yet").count() == 3)
+        check("our-apps file picker enabled", page.locator("#file-ours").is_enabled())
+        check("lists all five apps", page.locator("#catalogue li").count() == 5)
+        check("every app links to its latest version", page.locator("a.app-status", has_text="Get version").count() == 5)
+        check("nothing says 'not released yet'", page.locator("text=Not released yet").count() == 0)
         check("install button disabled", page.locator("#install").is_disabled())
         shot(page, "01-start")
         check("no JS errors", not errors)
@@ -127,7 +156,7 @@ def main():
         page.context.close()
 
         # 5. Official path: verified build, then install.
-        page, errors = open_page(browser, url, f"{{officialSha: '{OFFICIAL_SHA}', installDelayMs: 400}}", **desktop)
+        page, errors = open_page(browser, url, f"{{officialSha: '{OFFICIAL_SHA}', studioCert: '{STUDIO_CERT_SHA}', installDelayMs: 400}}", **desktop)
         connect(page)
         expect(page.locator("#connect-done")).to_contain_text("Google Pixel 8")
         check("connected shows phone name", step_state(page, "connect") == "done")
@@ -136,9 +165,14 @@ def main():
         check("tampered file refused", page.locator("#install").is_disabled())
         page.locator("#step-choose").scroll_into_view_if_needed()
         shot(page, "05-official-mismatch", full=False)
+        page.set_input_files("#file-ours", str(OLDER))
+        expect(page.locator("#ours-result")).to_contain_text("isn't the latest release")
+        check("our older build refused", page.locator("#install").is_disabled())
         page.set_input_files("#file-ours", str(OFFICIAL))
         expect(page.locator("#ours-result")).to_contain_text("Verified, official build: Lead One ECG 1.0.0")
         check("checksum shown", OFFICIAL_SHA in page.locator("#ours-result").inner_text())
+        fingerprint = ":".join(STUDIO_CERT_SHA[i:i + 2] for i in range(0, 64, 2)).upper()
+        check("signing certificate shown", fingerprint in page.locator("#ours-result").inner_text())
         check("install enabled for verified build", page.locator("#install").is_enabled())
         check("install button names the phone", page.locator("#install").inner_text() == "Install on Google Pixel 8")
         shot(page, "06-official-verified")
@@ -153,6 +187,15 @@ def main():
         page.click("text=Install another app")
         check("'install another' clears the file", page.locator("#install").is_disabled())
         check("no JS errors in official flow", not errors)
+        page.context.close()
+
+        # 5b. Checksum matches a release but the certificate isn't ours.
+        page, errors = open_page(browser, url, f"{{officialSha: '{WRONG_KEY_SHA}', studioCert: '{STUDIO_CERT_SHA}'}}", **desktop)
+        connect(page)
+        page.set_input_files("#file-ours", str(WRONG_KEY))
+        expect(page.locator("#ours-result")).to_contain_text("signature doesn't match ours")
+        check("wrong certificate refused", page.locator("#install").is_disabled())
+        check("no JS errors with wrong certificate", not errors)
         page.context.close()
 
         # 6. Other path: bad files, warning, checksum compare, consent, install error.
@@ -206,7 +249,7 @@ def main():
 
         # 8. Phone-sized screen and dark mode.
         phone = dict(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True)
-        page, _ = open_page(browser, url, f"{{officialSha: '{OFFICIAL_SHA}'}}", **phone)
+        page, _ = open_page(browser, url, f"{{officialSha: '{OFFICIAL_SHA}', studioCert: '{STUDIO_CERT_SHA}'}}", **phone)
         connect(page)
         page.set_input_files("#file-ours", str(OFFICIAL))
         expect(page.locator("#ours-result")).to_contain_text("Verified")
