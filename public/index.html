@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
   <title>Install Android apps with a USB cable · Anonaconda Code Lab</title>
@@ -53,7 +53,7 @@
           <button type="button" class="button primary" id="connect">Connect phone</button>
         </div>
         <div id="connect-waiting" class="notice waiting" hidden role="status">
-          <p><b>Look at your phone.</b> Tap <b>Allow</b> on “Allow USB debugging?”. Tick “Always allow from this computer” to skip this next time.</p>
+          <p><b>Look at your phone.</b> Tap <b>Allow</b> on “Allow USB debugging?”. On your own computer, tick “Always allow from this computer” to skip this next time. Don't tick it on a shared or public computer.</p>
           <p class="aside">No prompt? Unlock the phone, unplug it, plug it back in, and connect again.</p>
         </div>
         <div id="connect-done" hidden>

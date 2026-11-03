@@ -76,9 +76,15 @@ build, and check the APK is signed with the studio certificate
 
 ## Hosting
 
-`dist/` can go on any static host. `public/_headers` sets security headers on
-Netlify and Cloudflare Pages (including `frame-ancestors 'none'`, which a
-`<meta>` tag can't set). On other hosts, set the same headers in their config.
+`dist/` can go on any static host. Build with `npm ci && npm run build`, so the
+exact versions in `package-lock.json` are used. `public/_headers` sets security
+headers on Netlify and Cloudflare Pages (including `frame-ancestors 'none'`,
+which a `<meta>` tag can't set). On other hosts, set the same headers in their
+config.
+
+Keep install.anonacondacodelab.com for the Installer only. The browser's USB key
+(the one phones "Always allow") is stored per web address, so anything else
+served there could read it.
 
 ## Licence
 

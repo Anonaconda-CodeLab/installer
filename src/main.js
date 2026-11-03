@@ -49,7 +49,7 @@ const state = {
   phone: null, // { adb, name, android }
   connecting: false,
   path: "ours", // "ours" | "other"
-  selection: null, // { file, sha256, official, trusted }
+  selection: null, // { file, bytes, sha256, certs, official, trusted }
   installing: false,
   installed: false,
 };
@@ -239,6 +239,7 @@ for (const tab of tabs) {
 }
 
 function clearSelection() {
+  pickId++;
   state.selection = null;
   state.installed = false;
   delete document.body.dataset.installed;
@@ -250,7 +251,7 @@ function clearSelection() {
   refresh();
 }
 
-function fileFacts({ file, sha256, certs }) {
+function fileFacts({ file, sha256, certs }, { claimed = false } = {}) {
   return h(
     "dl",
     { class: "file-facts" },
@@ -258,7 +259,7 @@ function fileFacts({ file, sha256, certs }) {
     h("dd", {}, `${file.name} (${formatSize(file.size)})`),
     h("dt", {}, "SHA-256"),
     h("dd", {}, h("code", { class: "checksum" }, sha256), copyButton(sha256)),
-    h("dt", {}, "Signing certificate"),
+    h("dt", {}, claimed ? "Signing certificate (as stated in the file)" : "Signing certificate"),
     h(
       "dd",
       {},
@@ -283,7 +284,13 @@ function copyButton(text) {
   return button;
 }
 
+// Each pick (or tab switch) gets a number; results from an older pick are ignored,
+// so a slow check can never replace a newer choice.
+let pickId = 0;
+
 async function readFile(file, resultEl) {
+  const id = ++pickId;
+  const stale = () => id !== pickId;
   state.selection = null;
   state.installed = false;
   delete document.body.dataset.installed;
@@ -295,18 +302,27 @@ async function readFile(file, resultEl) {
   }
   show(resultEl, h("p", { class: "aside", role: "status" }, `Checking ${file.name}…`));
   const problem = await checkApkFile(file);
+  if (stale()) return null;
   if (problem) {
     show(resultEl, notice("danger", problem.title, problem.detail));
     return null;
   }
-  const bytes = await file.arrayBuffer();
+  // Read once: the checks run on these bytes, and these same bytes are installed.
+  let bytes;
+  try {
+    bytes = await file.arrayBuffer();
+  } catch {
+    if (!stale()) show(resultEl, notice("danger", "Couldn't read this file", "Choose it again. If it keeps happening, download it again."));
+    return null;
+  }
   const sha256 = await sha256Hex(bytes);
   const certs = await signingCertSha256s(bytes);
+  if (stale()) return null;
   const studioSigned = isStudioSigned(certs);
   const match = findOfficialBuild(sha256);
   // Ours only if the checksum is a published release AND it carries our certificate.
   const official = match && studioSigned ? match : null;
-  return { file, sha256, certs, studioSigned, official, checksumOnly: match && !studioSigned };
+  return { file, bytes, sha256, certs, studioSigned, official, checksumOnly: match && !studioSigned };
 }
 
 $("file-ours").addEventListener("change", async (event) => {
@@ -430,7 +446,7 @@ $("file-other").addEventListener("change", async (event) => {
 
   show(
     resultEl,
-    fileFacts(checked),
+    fileFacts(checked, { claimed: true }),
     h(
       "div",
       { class: "compare" },
@@ -474,7 +490,7 @@ $("install").addEventListener("click", async () => {
 
   let phase = "sending";
   try {
-    await installApk(phone.adb, state.selection.file, {
+    await installApk(phone.adb, new Blob([state.selection.bytes]), {
       onProgress: (fraction) => {
         if (phase !== "sending") return;
         if (fraction >= 1) {

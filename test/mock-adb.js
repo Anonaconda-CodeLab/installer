@@ -41,6 +41,9 @@ export async function connectPhone({ onWaitingForApproval } = {}) {
 }
 
 export async function installApk(_adb, file, { onProgress } = {}) {
+  // Record what would reach the phone, so the test can check it's the file that was checked.
+  const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+  window.__installedSha = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
   const steps = 10;
   for (let i = 1; i <= steps; i++) {
     if (mock().pauseAt === i) await new Promise(() => {});

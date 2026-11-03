@@ -59,6 +59,8 @@ TAMPERED, _ = make_apk("lead-one-ecg-1.0.0-modified.apk", b"tampered" * 20000)
 OLDER, _ = make_apk("lead-one-ecg-0.9.0.apk", b"older" * 20000, STUDIO_CERT)
 WRONG_KEY, WRONG_KEY_SHA = make_apk("lead-one-ecg-1.0.0-other-key.apk", b"official" * 20000, b"someone else")
 OTHER, OTHER_SHA = make_apk("some-other-app.apk", b"other" * 30000)
+BIG = TMP / "big-slow-app.apk"
+BIG.write_bytes(b"PK\x03\x04" + bytes(80 * 1024 * 1024))
 NOT_APK = TMP / "holiday-photo.apk"
 NOT_APK.write_bytes(b"\xff\xd8\xff\xe0 not a zip")
 BUNDLE = TMP / "game.xapk"
@@ -189,11 +191,30 @@ def main():
         shot(page, "07-installing", full=False)
         expect(page.locator("#install-result")).to_contain_text("Installed Lead One ECG 1.0.0")
         check("reminder to turn off Developer options after install", "turn off Developer options" in page.locator("#install-result").inner_text())
+        check("the bytes installed are the ones that were checked", page.evaluate("window.__installedSha") == OFFICIAL_SHA)
         check("all steps done after install", all(step_state(page, s) == "done" for s in ["ready", "connect", "choose", "install"]))
         shot(page, "08-installed")
         page.click("text=Install another app")
         check("'install another' clears the file", page.locator("#install").is_disabled())
         check("no JS errors in official flow", not errors)
+        page.context.close()
+
+        # 5a. A slow check must not replace a newer choice.
+        page, errors = open_page(browser, url, "{}", **desktop)
+        page.click("#tab-other")
+        page.set_input_files("#file-other", str(BIG))
+        page.set_input_files("#file-other", str(OTHER))
+        expect(page.locator("#other-result")).to_contain_text(OTHER_SHA)
+        page.wait_for_timeout(3000)
+        check("newer choice still shown after the slow check ends", OTHER_SHA in page.locator("#other-result").inner_text() and "big-slow-app" not in page.locator("#other-result").inner_text())
+        check("other app's certificate labelled as claimed", "as stated in the file" in page.locator("#other-result").inner_text())
+        page.click("#tab-ours")
+        page.click("#tab-other")
+        page.set_input_files("#file-other", str(BIG))
+        page.click("#tab-ours")
+        page.wait_for_timeout(3000)
+        check("switching tabs drops a check still running", page.locator("#other-result").inner_text() == "" and page.locator("#install").is_disabled())
+        check("no JS errors with overlapping checks", not errors)
         page.context.close()
 
         # 5b. Checksum matches a release but the certificate isn't ours.
@@ -269,6 +290,13 @@ def main():
         page.locator("#help details").first.evaluate("d => d.open = true")
         shot(page, "12-dark")
         page.context.close()
+
+        # 9. Security headers.
+        headers = (ROOT / "public" / "_headers").read_text()
+        for needed in ["frame-ancestors 'none'", "require-trusted-types-for 'script'", "Strict-Transport-Security", "Cross-Origin-Opener-Policy: same-origin", "Cross-Origin-Resource-Policy: same-origin", "usb=(self)"]:
+            check(f"header set: {needed}", needed in headers)
+        meta = (ROOT / "public" / "index.html").read_text()
+        check("Trusted Types also in the page's own CSP", "require-trusted-types-for 'script'" in meta)
 
         browser.close()
     server.shutdown()

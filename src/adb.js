@@ -72,7 +72,7 @@ function capitalise(text) {
 }
 
 /**
- * Streams the file to the phone and installs it.
+ * Streams the file (a Blob holding the exact bytes that were checked) to the phone and installs it.
  * `onProgress(fraction)` reports how much of the file has been sent (0–1).
  * Resolves when the phone reports success; rejects with the phone's message otherwise.
  */
