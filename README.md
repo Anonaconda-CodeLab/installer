@@ -76,10 +76,15 @@ build, and check the APK is signed with the studio certificate
 
 ## Hosting
 
-`dist/` can go on any static host. Build with `npm ci && npm run build`, so the
-exact versions in `package-lock.json` are used. `public/_headers` sets security
-headers on Netlify and Cloudflare Pages (including `frame-ancestors 'none'`,
-which a `<meta>` tag can't set). On other hosts, set the same headers in their
+Cloudflare Pages, as for the studio's other apps with a build step: production
+branch `main`, framework preset None, build command `node build.mjs`, output
+directory `dist`, environment variable `NODE_VERSION=22`. Cloudflare installs
+the dependencies from `package-lock.json` before building. Elsewhere, build with
+`npm ci && npm run build`, so the exact locked versions are used.
+
+`public/_headers` sets the security headers (including `frame-ancestors 'none'`,
+which a `<meta>` tag can't set) and keeps the `*.pages.dev` address out of search
+engines. On a host that doesn't read `_headers`, set the same headers in its
 config.
 
 Keep install.anonacondacodelab.com for the Installer only. The browser's USB key

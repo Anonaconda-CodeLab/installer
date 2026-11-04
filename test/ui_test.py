@@ -180,6 +180,9 @@ def main():
         page.set_input_files("#file-ours", str(OFFICIAL))
         expect(page.locator("#ours-result")).to_contain_text("Verified, official build: Lead One ECG 1.0.0")
         check("checksum shown", OFFICIAL_SHA in page.locator("#ours-result").inner_text())
+        for sel in ["#ours-result .file-facts dd span", "#ours-result code.checksum"]:
+            check(f"kept from translators: {sel}", all(e.get_attribute("translate") == "no" for e in page.locator(sel).all()) and page.locator(sel).count() > 0)
+        check("phone name kept from translators", page.locator("#phone-name").get_attribute("translate") == "no")
         fingerprint = ":".join(STUDIO_CERT_SHA[i:i + 2] for i in range(0, 64, 2)).upper()
         check("signing certificate shown", fingerprint in page.locator("#ours-result").inner_text())
         check("install enabled for verified build", page.locator("#install").is_enabled())
@@ -293,10 +296,11 @@ def main():
 
         # 9. Security headers.
         headers = (ROOT / "public" / "_headers").read_text()
-        for needed in ["frame-ancestors 'none'", "require-trusted-types-for 'script'", "Strict-Transport-Security", "Cross-Origin-Opener-Policy: same-origin", "Cross-Origin-Resource-Policy: same-origin", "usb=(self)"]:
+        for needed in ["connect-src 'none'", "https://:project.pages.dev/*", "X-Robots-Tag: noindex", "frame-ancestors 'none'", "require-trusted-types-for 'script'", "Strict-Transport-Security", "Cross-Origin-Opener-Policy: same-origin", "Cross-Origin-Resource-Policy: same-origin", "usb=(self)"]:
             check(f"header set: {needed}", needed in headers)
         meta = (ROOT / "public" / "index.html").read_text()
         check("Trusted Types also in the page's own CSP", "require-trusted-types-for 'script'" in meta)
+        check("page's own CSP blocks all connections", "connect-src 'none'" in meta and "connect-src 'self'" not in meta)
 
         browser.close()
     server.shutdown()

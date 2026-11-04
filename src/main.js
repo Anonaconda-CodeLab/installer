@@ -32,7 +32,7 @@ function notice(kind, title, detail, raw) {
     { class: `notice ${kind}`, role: kind === "danger" ? "alert" : "status" },
     h("p", {}, h("b", {}, title)),
     detail && h("p", {}, detail),
-    raw && h("details", { class: "raw" }, h("summary", {}, "Message from the phone"), h("pre", {}, raw)),
+    raw && h("details", { class: "raw" }, h("summary", {}, "Message from the phone"), h("pre", { translate: "no" }, raw)),
   );
 }
 
@@ -184,7 +184,8 @@ function renderCatalogue() {
     ...OFFICIAL_APPS.map((app) => {
       const latest = app.release;
       // Download in place: leaving this page would drop the phone's USB connection.
-      // The install page opens in a new tab for the same reason.
+      // The install page opens in a new tab for the same reason. This is a deliberate
+      // exception to the studio's same-tab rule (owner's decision, 3 Nov 2026).
       const status = latest
         ? h(
             "span",
@@ -256,15 +257,15 @@ function fileFacts({ file, sha256, certs }, { claimed = false } = {}) {
     "dl",
     { class: "file-facts" },
     h("dt", {}, "File"),
-    h("dd", {}, `${file.name} (${formatSize(file.size)})`),
+    h("dd", {}, h("span", { translate: "no" }, file.name), ` (${formatSize(file.size)})`),
     h("dt", {}, "SHA-256"),
-    h("dd", {}, h("code", { class: "checksum" }, sha256), copyButton(sha256)),
+    h("dd", {}, h("code", { class: "checksum", translate: "no" }, sha256), copyButton(sha256)),
     h("dt", {}, claimed ? "Signing certificate (as stated in the file)" : "Signing certificate"),
     h(
       "dd",
       {},
       certs
-        ? certs.map((c) => h("code", { class: "checksum" }, formatFingerprint(c)))
+        ? certs.map((c) => h("code", { class: "checksum", translate: "no" }, formatFingerprint(c)))
         : "Not shown: this file uses an older signature format.",
     ),
   );

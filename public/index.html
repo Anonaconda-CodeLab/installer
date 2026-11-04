@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; require-trusted-types-for 'script'; trusted-types 'none'">
   <meta name="referrer" content="no-referrer">
   <meta name="color-scheme" content="light dark">
   <title>Install Android apps with a USB cable · Anonaconda Code Lab</title>
@@ -57,7 +57,7 @@
           <p class="aside">No prompt? Unlock the phone, unplug it, plug it back in, and connect again.</p>
         </div>
         <div id="connect-done" hidden>
-          <p class="connected" role="status"><span class="dot" aria-hidden="true"></span>Connected to <b id="phone-name">your phone</b><span id="phone-android"></span>.</p>
+          <p class="connected" role="status"><span class="dot" aria-hidden="true"></span>Connected to <b id="phone-name" translate="no">your phone</b><span id="phone-android"></span>.</p>
           <button type="button" class="button text" id="disconnect">Disconnect</button>
         </div>
         <div id="connect-error" class="notice danger" hidden role="alert"></div>
@@ -154,7 +154,7 @@
           <li>It can take a few tries.</li>
           <li>If one phone shows “MTP Host” or starts reading the other phone's files, reverse the cable end for end, or swap which phone runs the Installer.</li>
           <li>Open the Installer from its web address, install.anonacondacodelab.com. A copy opened from the phone's storage can't use USB.</li>
-          <li>Use Chrome or another full Chromium browser.</li>
+          <li>Use Chrome or another full Chromium browser. A phone's built-in browser (often a WebView in custom ROMs) can't use USB.</li>
           <li>Use a good data cable. With a weak one, the phones may charge but the page says “No devices found”.</li>
           <li>Keep the helper phone unlocked.</li>
           <li>Install stays grey? Look at the second phone: it's waiting for you to tap <b>Allow</b> on “Allow USB debugging?”.</li>
