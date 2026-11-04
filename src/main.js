@@ -403,7 +403,7 @@ $("file-other").addEventListener("change", async (event) => {
     type: "text",
     id: "compare-input",
     autocomplete: "off",
-    spellcheck: false,
+    spellcheck: "false", // a string: h() skips false values, so a boolean would never set the attribute
     placeholder: "Paste the SHA-256 from the publisher's site",
   });
   const consent = h("input", { type: "checkbox", id: "consent" });
@@ -556,8 +556,11 @@ $("forget-key").addEventListener("click", async () => {
   try {
     await forgetKey();
     status.textContent = "Deleted. Your phone will ask for approval next time you connect.";
-  } catch {
-    status.textContent = "Couldn't delete the key. Clearing this site's data in your browser settings does the same thing.";
+  } catch (error) {
+    status.textContent =
+      error?.name === "KeyInUseError"
+        ? "The key is still in use in another tab. Close any other tabs with the Installer open, then try again."
+        : "Couldn't delete the key. Clearing this site's data in your browser settings does the same thing.";
   }
 });
 

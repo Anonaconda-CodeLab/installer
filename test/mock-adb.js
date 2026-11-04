@@ -57,4 +57,10 @@ export async function installApk(_adb, file, { onProgress } = {}) {
   throw new Error(result);
 }
 
-export async function forgetKey() {}
+export async function forgetKey() {
+  if (mock().forget === "blocked") {
+    const e = new Error("The key is in use in another tab");
+    e.name = "KeyInUseError";
+    throw e;
+  }
+}

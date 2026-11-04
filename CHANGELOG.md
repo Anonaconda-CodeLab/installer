@@ -17,6 +17,9 @@
 - CI on every push: unit tests (app list, certificate reader, headers), the build, and the page test with a
   simulated phone; actions pinned to exact commits, read-only (review finding 3).
 - File names, checksums, certificates, the phone's name and its messages are kept from browser translators.
+- From CodeRabbit's full review (PR #1): spell checking really is off in the checksum box; "Delete this browser's
+  key" no longer says "Deleted" while another Installer tab still holds the key, and asks to close other tabs and
+  try again; `npm run dev` also picks up changes in `public/`.
 
 ## 0.1.0
 

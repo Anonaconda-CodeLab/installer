@@ -97,6 +97,11 @@ export function forgetKey() {
     const request = indexedDB.deleteDatabase(KEY_DATABASE);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
-    request.onblocked = () => resolve();
+    // Another tab still has the key open: the deletion waits, so don't report it as done.
+    request.onblocked = () => {
+      const blocked = new Error("The key is in use in another tab");
+      blocked.name = "KeyInUseError";
+      reject(blocked);
+    };
   });
 }

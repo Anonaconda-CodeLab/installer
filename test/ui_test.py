@@ -245,6 +245,7 @@ def main():
         check("install blocked until consent", page.locator("#install").is_disabled())
         page.fill("#compare-input", OTHER_SHA[:20])
         expect(page.locator(".compare-result")).to_contain_text("isn't a complete SHA-256")
+        check("checksum box has spellcheck off", page.locator("#compare-input").get_attribute("spellcheck") == "false")
         check("partial checksum doesn't lock the tick box", page.locator("#consent").is_enabled())
         page.check("#consent")
         page.fill("#compare-input", "0" * 64)
@@ -292,6 +293,20 @@ def main():
         page, _ = open_page(browser, url, "{}", color_scheme="dark", **desktop)
         page.locator("#help details").first.evaluate("d => d.open = true")
         shot(page, "12-dark")
+        page.context.close()
+
+        # 8b. Forget key: done, and blocked by another tab.
+        page, _ = open_page(browser, url, "{}", **desktop)
+        page.locator("#forget-key").evaluate("b => b.closest('details').open = true")
+        page.click("#forget-key")
+        expect(page.locator("#forget-key-status")).to_contain_text("Deleted")
+        check("forget key reports done", True)
+        page.context.close()
+        page, _ = open_page(browser, url, "{forget: 'blocked'}", **desktop)
+        page.locator("#forget-key").evaluate("b => b.closest('details').open = true")
+        page.click("#forget-key")
+        expect(page.locator("#forget-key-status")).to_contain_text("Close any other tabs with the Installer open")
+        check("blocked forget key isn't reported as done", "Deleted" not in page.locator("#forget-key-status").inner_text())
         page.context.close()
 
         # 9. Security headers.

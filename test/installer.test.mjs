@@ -108,3 +108,19 @@ test("the page doesn't encourage “Always allow”", () => {
   assert.ok(page.includes("There's no need to tick “Always allow from this computer”"));
   assert.ok(!/tick “Always allow from this computer” to skip/.test(page));
 });
+
+test("forgetting the key fails, not succeeds, when another tab blocks it", async () => {
+  const { forgetKey } = await import("../src/adb.js");
+  const fakeDb = (event) => ({
+    deleteDatabase() {
+      const request = {};
+      setTimeout(() => request[event]?.());
+      return request;
+    },
+  });
+  globalThis.indexedDB = fakeDb("onblocked");
+  await assert.rejects(forgetKey(), { name: "KeyInUseError" });
+  globalThis.indexedDB = fakeDb("onsuccess");
+  await forgetKey();
+  delete globalThis.indexedDB;
+});

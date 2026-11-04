@@ -3,6 +3,7 @@
 //   node build.mjs --serve   build, then serve dist/ on http://localhost:8000 and rebuild on change
 
 import * as esbuild from "esbuild";
+import { watch } from "node:fs";
 import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -29,6 +30,8 @@ const options = {
 if (serve) {
   const ctx = await esbuild.context(options);
   await ctx.watch();
+  // esbuild only watches the script's inputs; copy public/ again whenever a page file changes.
+  watch("public", { recursive: true }, () => cp("public", outdir, { recursive: true }).catch(console.error));
   const { port } = await ctx.serve({ servedir: outdir, port: 8000 });
   console.log(`Serving on http://localhost:${port}`);
 } else {
