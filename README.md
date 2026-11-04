@@ -33,7 +33,7 @@ registered, and this page makes that easy. We support
 ## Develop
 
 ```sh
-npm install
+npm ci --ignore-scripts
 npm run dev      # http://localhost:8000, rebuilds on change
 npm run build    # static site in dist/
 ```
@@ -43,6 +43,7 @@ WebUSB needs a secure context: `localhost` or HTTPS.
 ## Test
 
 ```sh
+npm test                        # unit tests: app list, certificate reader, headers
 node test/build-test.mjs        # page with a simulated phone
 python3 test/ui_test.py [dir]   # Playwright; optional dir for screenshots
 ```
@@ -76,11 +77,13 @@ build, and check the APK is signed with the studio certificate
 
 ## Hosting
 
-Cloudflare Pages, as for the studio's other apps with a build step: production
-branch `main`, framework preset None, build command `node build.mjs`, output
-directory `dist`, environment variable `NODE_VERSION=22`. Cloudflare installs
-the dependencies from `package-lock.json` before building. Elsewhere, build with
-`npm ci && npm run build`, so the exact locked versions are used.
+Cloudflare Pages: production branch `main`, framework preset None, output
+directory `dist`, build command `npm ci --ignore-scripts && node build.mjs`, and
+environment variables `NODE_VERSION=22` and `SKIP_DEPENDENCY_INSTALL=1`. The
+last one stops Cloudflare's own automatic `npm install`, so only the build
+command installs: the exact versions in `package-lock.json`, with no package's
+install scripts run. Elsewhere, build the same way:
+`npm ci --ignore-scripts && npm run build`.
 
 `public/_headers` sets the security headers (including `frame-ancestors 'none'`,
 which a `<meta>` tag can't set) and keeps the `*.pages.dev` address out of search

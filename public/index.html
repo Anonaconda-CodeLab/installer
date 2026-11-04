@@ -53,7 +53,7 @@
           <button type="button" class="button primary" id="connect">Connect phone</button>
         </div>
         <div id="connect-waiting" class="notice waiting" hidden role="status">
-          <p><b>Look at your phone.</b> Tap <b>Allow</b> on “Allow USB debugging?”. On your own computer, tick “Always allow from this computer” to skip this next time. Don't tick it on a shared or public computer.</p>
+          <p><b>Look at your phone.</b> Tap <b>Allow</b> on “Allow USB debugging?”. There's no need to tick “Always allow from this computer”: tapping Allow each time keeps your phone safest.</p>
           <p class="aside">No prompt? Unlock the phone, unplug it, plug it back in, and connect again.</p>
         </div>
         <div id="connect-done" hidden>
@@ -165,7 +165,7 @@
       <details>
         <summary>What happens to my file and my data?</summary>
         <p>Nothing is uploaded. This page is a set of plain files: it has no tracking, no cookies, no analytics, and no server of its own. The app file goes straight from your computer to your phone over the cable, and its checksum is worked out on your computer.</p>
-        <p>To connect, your browser creates a key and stores it only in this browser, so your phone can remember it when you tick “Always allow”. You can delete it here, and remove the approval on the phone in Developer options with <b>Revoke USB debugging authorizations</b>.</p>
+        <p>To connect, your browser creates a key and stores it only in this browser. If you ever ticked “Always allow” on the phone, it will accept that key without asking while USB debugging is on. You can delete it here, and remove the approval on the phone in Developer options with <b>Revoke USB debugging authorizations</b>.</p>
         <button type="button" class="button text" id="forget-key">Delete this browser's key</button>
         <p class="aside" id="forget-key-status" role="status"></p>
       </details>

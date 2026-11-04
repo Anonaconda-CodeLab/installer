@@ -10,7 +10,12 @@
 - Installs the exact bytes that were checked; a slow check can no longer replace a newer choice.
 - Security: Trusted Types, `connect-src 'none'`, HSTS, Cross-Origin-Opener-Policy and Cross-Origin-Resource-Policy;
   the `*.pages.dev` address is kept out of search engines.
-- Help: phone-to-phone tips from real-phone testing; "Always allow" only on your own computer.
+- Help: phone-to-phone tips from real-phone testing. The page no longer suggests "Always allow": tapping Allow
+  each time keeps the phone safest (operations' private security review, finding 1).
+- Builds run with install scripts off (`npm ci --ignore-scripts`; on Cloudflare with `SKIP_DEPENDENCY_INSTALL=1`),
+  and dependency versions are exact in `package.json` (review findings 2 and 4).
+- CI on every push: unit tests (app list, certificate reader, headers), the build, and the page test with a
+  simulated phone; actions pinned to exact commits, read-only (review finding 3).
 - File names, checksums, certificates, the phone's name and its messages are kept from browser translators.
 
 ## 0.1.0

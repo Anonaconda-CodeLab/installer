@@ -1,0 +1,30 @@
+name: CI
+# Runs the unit tests, the build and the page test (a simulated phone in a real browser) on every push and pull
+# request. Read-only, no secrets. Install scripts are switched off, as in the Cloudflare build. Actions are pinned
+# to exact commits (the comment names the release), like the studio's other apps.
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09   # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444   # v5.0.0
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - name: Unit tests (app list, certificate reader, headers)
+        run: npm test
+      - name: Build
+        run: node build.mjs
+      - name: Page test with a simulated phone
+        run: |
+          python3 -m pip install --user playwright==1.63.0
+          python3 -m playwright install --with-deps chromium
+          node test/build-test.mjs
+          python3 test/ui_test.py
