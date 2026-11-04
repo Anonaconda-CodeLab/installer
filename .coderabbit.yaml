@@ -1,0 +1,55 @@
+# CodeRabbit settings for the one-off full review of the Installer (PR from full-review into review-base, never merged)
+language: en-GB
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "review-base"
+  # built output, fonts, images and the lockfile: not our code, or generated from it
+  path_filters:
+    - "!dist/**"
+    - "!dist-test/**"
+    - "!public/fonts/**"
+    - "!package-lock.json"
+    - "!**/*.png"
+    - "!**/*.svg"
+    - "!**/*.ico"
+    - "!**/*.woff2"
+  path_instructions:
+    - path: "**"
+      instructions: |
+        The Anonaconda Installer is a static web page that installs Android APKs on a phone over USB (WebUSB + ADB,
+        via the Tango library), from Chrome on a computer or another phone. It must never do more than install the
+        exact file the person chose, and must not be able to contact any server (Content Security Policy
+        connect-src 'none'). Focus on security: anything that could install a different file than the one checked,
+        mislabel an unofficial file as an official studio build, run other ADB commands on the phone, inject markup
+        into the page, or weaken the page's policies.
+    - path: "src/adb.js"
+      instructions: |
+        ADB connection, authentication and install. Check that nothing beyond reading device properties and
+        installing the chosen bytes is possible, and how the browser's ADB key is stored and deleted.
+    - path: "src/apk.js"
+      instructions: |
+        Parses untrusted APK files (ZIP and APK Signing Block) to read the signer certificates. Look for out-of-bounds
+        reads, wrong offsets, integer overflow, unbounded loops and anything that could make a crafted file report
+        the studio's certificate.
+    - path: "src/apps.js"
+      instructions: |
+        The list of official studio releases (SHA-256 per APK) and the studio certificate. A file is official only
+        when its SHA-256 matches a listed release AND it is signed with the studio certificate.
+    - path: "src/main.js"
+      instructions: |
+        UI and the decision whether a file may be installed. Check that the bytes installed are the bytes checked,
+        that stale results can't replace a newer choice, that a mismatching pasted checksum blocks the install, and
+        that file names and phone names are never inserted as HTML.
+    - path: "public/_headers"
+      instructions: |
+        Security headers (CSP with Trusted Types, framing, Permissions-Policy for USB). Check for gaps.
+    - path: ".github/workflows/**"
+      instructions: |
+        CI: check permissions, pinned actions and supply-chain risks.
