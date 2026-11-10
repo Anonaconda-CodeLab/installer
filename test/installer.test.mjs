@@ -10,7 +10,7 @@ import { signingCertSha256s, formatFingerprint } from "../src/apk.js";
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
 test("every official app has a well-formed latest release", () => {
-  assert.equal(OFFICIAL_APPS.length, 5);
+  assert.equal(OFFICIAL_APPS.length, 6);
   const ids = new Set();
   for (const app of OFFICIAL_APPS) {
     assert.ok(!ids.has(app.id), `${app.id} listed once`);

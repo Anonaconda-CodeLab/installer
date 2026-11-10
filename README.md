@@ -20,7 +20,7 @@ registered, and this page makes that easy. We support
   third-party requests (fonts are self-hosted). The APK goes straight from the
   computer to the phone; nothing is uploaded.
 - Two paths:
-  1. **Our apps** (Lead One ECG, Rounds, Still Point, Unmarked, Flatbed): the
+  1. **Our apps** (Lead One ECG, Rounds, Still Point, Unmarked, Flatbed, Redact): the
      file's SHA-256 must match the app's latest release in `src/apps.js`, and
      its signing certificate must be the studio's (`STUDIO_CERT_SHA256`). Only
      then does it show "Verified, official build" and can be installed.
@@ -69,7 +69,7 @@ build, and check the APK is signed with the studio certificate
 
 ## Before publishing
 
-- [x] Latest releases, SHA-256s and install pages for all five apps in `src/apps.js`; certificate checked
+- [x] Latest releases, SHA-256s and install pages for all the apps in `src/apps.js`; certificate checked
 - [x] One-line description for Still Point
 - [x] Phone-to-phone install tested (Pixel 7a on GrapheneOS as host, Pixel 6 Pro as target)
 - [ ] Choose hosting for install.anonacondacodelab.com and check the security headers are served

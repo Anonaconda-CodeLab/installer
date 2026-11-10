@@ -121,14 +121,14 @@ def main():
         page, errors = open_page(browser, url, "{}", **desktop)
         check("starts on step 1", step_state(page, "ready") == "current")
         check("our-apps file picker enabled", page.locator("#file-ours").is_enabled())
-        check("lists all five apps", page.locator("#catalogue li").count() == 5)
-        check("every app has a direct download", page.locator("a.app-download").count() == 5)
+        check("lists all six apps", page.locator("#catalogue li").count() == 6)
+        check("every app has a direct download", page.locator("a.app-download").count() == 6)
         first = page.locator("a.app-download").first
         check("download points at the tagged release", first.get_attribute("href") == "https://github.com/Anonaconda-CodeLab/lead-one-ecg/releases/download/v1.8.3/LeadOne-ECG-1.8.3.apk")
         check("download stays in this tab", first.get_attribute("target") is None)
         pages = page.locator("a.app-page")
-        check("every app links to its install page", pages.count() == 5)
-        check("install page opens in a new tab", all(pages.nth(i).get_attribute("target") == "_blank" and "noopener" in pages.nth(i).get_attribute("rel") for i in range(5)))
+        check("every app links to its install page", pages.count() == 6)
+        check("install page opens in a new tab", all(pages.nth(i).get_attribute("target") == "_blank" and "noopener" in pages.nth(i).get_attribute("rel") for i in range(6)))
         check("new tab announced to screen readers", "opens in a new tab" in pages.first.inner_text() or pages.first.locator(".visually-hidden").count() == 1)
         check("nothing says 'not released yet'", page.locator("text=Not released yet").count() == 0)
         check("install button disabled", page.locator("#install").is_disabled())
@@ -297,6 +297,7 @@ def main():
 
         # 8b. Forget key: done, and blocked by another tab.
         page, _ = open_page(browser, url, "{}", **desktop)
+        check("help for people without a computer or second phone", "Apps such as AnyAPK can install from the same phone using Wireless debugging" in page.content())
         page.locator("#forget-key").evaluate("b => b.closest('details').open = true")
         page.click("#forget-key")
         expect(page.locator("#forget-key-status")).to_contain_text("Deleted")

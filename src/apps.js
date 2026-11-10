@@ -73,6 +73,18 @@ export const OFFICIAL_APPS = [
       sha256: "060469e6dac4dc3960aa120cb7abca92725f74a4c735268bfe89dab65bee8bae",
     },
   },
+  {
+    id: "redact",
+    repo: "redact", // github.com/Anonaconda-CodeLab/redact
+    name: "Redact",
+    blurb: "Cover faces, numbers and text in photos and screenshots before you share them.",
+    installPage: "https://redact.anonacondacodelab.com/android.html",
+    release: {
+      version: "1.0.0",
+      file: "Redact-1.0.0.apk",
+      sha256: "7cbe9bcbe5c1ae5526d2ed43c77911560ed888ce96fa92e66db1bd98f31f0960",
+    },
+  },
 ];
 
 /**

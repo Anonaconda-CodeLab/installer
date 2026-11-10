@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.2.0 (not yet published)
+## 0.3.0
+
+- Redact 1.0.0 added to "One of our apps" (checksum from its release's `.sha256` file, studio certificate checked).
+- New help entry for people with no computer or second phone: apps such as AnyAPK can install from the same phone
+  using Wireless debugging, with a note to use only one you trust.
+
+## 0.2.0 (4 Nov 2026)
 
 - Lists all five studio apps (Lead One ECG, Rounds, Still Point, Unmarked, Flatbed) with their latest releases,
   a direct "Download" link to each release's APK, and "Install page ↗" in a new tab (a deliberate exception to the
