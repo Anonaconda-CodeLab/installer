@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1
+
+- Remark 1.0.0 added to "One of our apps"; Lead One ECG updated to 1.8.4 and Flatbed to 1.0.3. Each checksum is
+  from the release's `.sha256` file, and each APK's certificate was checked against the studio certificate.
+- `.coderabbit.yaml`, so CodeRabbit can review pull requests into `main`, like the other apps.
+
 ## 0.3.0
 
 - Redact 1.0.0 added to "One of our apps" (checksum from its release's `.sha256` file, studio certificate checked).

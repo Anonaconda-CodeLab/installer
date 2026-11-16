@@ -20,7 +20,7 @@ registered, and this page makes that easy. We support
   third-party requests (fonts are self-hosted). The APK goes straight from the
   computer to the phone; nothing is uploaded.
 - Two paths:
-  1. **Our apps** (Lead One ECG, Rounds, Still Point, Unmarked, Flatbed, Redact): the
+  1. **Our apps** (Lead One ECG, Rounds, Still Point, Unmarked, Flatbed, Redact, Remark): the
      file's SHA-256 must match the app's latest release in `src/apps.js`, and
      its signing certificate must be the studio's (`STUDIO_CERT_SHA256`). Only
      then does it show "Verified, official build" and can be installed.

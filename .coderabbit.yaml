@@ -1,0 +1,34 @@
+# CodeRabbit settings for the Installer: reviews pull requests into main (the same shape as the studio's other apps)
+language: en-GB
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - "main"
+  # built output and dependencies: not this repo's code
+  path_filters:
+    - "!dist/**"
+    - "!dist-test/**"
+    - "!node_modules/**"
+    - "!package-lock.json"
+    - "!**/*.png"
+  path_instructions:
+    - path: "**"
+      instructions: |
+        The Installer is a web page that installs Android APKs on a phone over USB (WebUSB and ADB), entirely in the
+        browser. It has no server and no network access of its own: the page's Content Security Policy has
+        connect-src 'none'. Every APK file and everything the phone sends back is untrusted input. Focus on: anything
+        that could send data off the device; file names, certificate details or phone messages reaching the page as
+        HTML; anything that could install a different file from the one that was checked; and input that could crash,
+        hang or run out of memory. Every bundled third-party package and font needs its licence notice shipped with
+        the page: flag any that is missing (the studio's full licence screen for the Installer is still to come).
+    - path: "src/apps.js"
+      instructions: |
+        The list of official studio apps. Each release's sha256 must be the exact value from that GitHub release's
+        .sha256 file, the file name must match the release asset, and STUDIO_CERT_SHA256 must not change. A file is
+        "official" only when both its checksum and its signing certificate match: check that nothing weakens that.

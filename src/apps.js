@@ -20,9 +20,9 @@ export const OFFICIAL_APPS = [
     blurb: "ECG recorder for the Polar H10 chest strap.",
     installPage: "https://leadone.anonacondacodelab.com/android.html",
     release: {
-      version: "1.8.3",
-      file: "LeadOne-ECG-1.8.3.apk",
-      sha256: "e245e6ed09cb736a724fdd0a3d84d327bb1242f2d3dd0650b16feb9f0788709c",
+      version: "1.8.4",
+      file: "LeadOne-ECG-1.8.4.apk",
+      sha256: "42e85d997c605862ce473510c372cc1c045706c5a4e1d14397d05e42248a82a2",
     },
   },
   {
@@ -68,9 +68,9 @@ export const OFFICIAL_APPS = [
     blurb: "Scans documents to clean, searchable PDFs.",
     installPage: "https://flatbed.anonacondacodelab.com/android.html",
     release: {
-      version: "1.0.2",
-      file: "Flatbed-1.0.2.apk",
-      sha256: "060469e6dac4dc3960aa120cb7abca92725f74a4c735268bfe89dab65bee8bae",
+      version: "1.0.3",
+      file: "Flatbed-1.0.3.apk",
+      sha256: "2e8649b9c470b603a591feac1895c8990186f0f50a959fcd9404661d9a6d2674",
     },
   },
   {
@@ -83,6 +83,18 @@ export const OFFICIAL_APPS = [
       version: "1.0.0",
       file: "Redact-1.0.0.apk",
       sha256: "7cbe9bcbe5c1ae5526d2ed43c77911560ed888ce96fa92e66db1bd98f31f0960",
+    },
+  },
+  {
+    id: "remark",
+    repo: "remark", // github.com/Anonaconda-CodeLab/remark
+    name: "Remark",
+    blurb: "Add notes, arrows and shapes to photos and screenshots, then share a clean copy.",
+    installPage: "https://remark.anonacondacodelab.com/android.html",
+    release: {
+      version: "1.0.0",
+      file: "Remark-1.0.0.apk",
+      sha256: "056e0611584d24129268a637c44e04254dafbbc34818eba8a2812fa794891837",
     },
   },
 ];
