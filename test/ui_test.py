@@ -124,7 +124,7 @@ def main():
         check("lists all seven apps", page.locator("#catalogue li").count() == 7)
         check("every app has a direct download", page.locator("a.app-download").count() == 7)
         first = page.locator("a.app-download").first
-        check("download points at the tagged release", first.get_attribute("href") == "https://github.com/Anonaconda-CodeLab/lead-one-ecg/releases/download/v1.8.4/LeadOne-ECG-1.8.4.apk")
+        check("download points at the tagged release", first.get_attribute("href") == "https://github.com/Anonaconda-CodeLab/lead-one-ecg/releases/download/v1.8.5/LeadOne-ECG-1.8.5.apk")
         check("download stays in this tab", first.get_attribute("target") is None)
         pages = page.locator("a.app-page")
         check("every app links to its install page", pages.count() == 7)
