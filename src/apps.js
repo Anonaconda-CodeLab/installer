@@ -20,9 +20,9 @@ export const OFFICIAL_APPS = [
     blurb: "ECG recorder for the Polar H10 chest strap.",
     installPage: "https://leadone.anonacondacodelab.com/android.html",
     release: {
-      version: "1.8.4",
-      file: "LeadOne-ECG-1.8.4.apk",
-      sha256: "42e85d997c605862ce473510c372cc1c045706c5a4e1d14397d05e42248a82a2",
+      version: "1.8.5",
+      file: "LeadOne-ECG-1.8.5.apk",
+      sha256: "278c50d93b140efa6f3d83772cd60e950670b2afd4f8f2c1c902172cf4bf9a9b",
     },
   },
   {

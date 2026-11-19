@@ -58,7 +58,7 @@ certificate is read by the real code. Test with real phones by hand.
 release, replace its entry:
 
 ```js
-release: { version: "1.8.4", file: "LeadOne-ECG-1.8.4.apk", sha256: "…64 hex characters…" },
+release: { version: "1.8.5", file: "LeadOne-ECG-1.8.5.apk", sha256: "…64 hex characters…" },
 ```
 
 The "Download" link is built from `repo`, the version and `file`
