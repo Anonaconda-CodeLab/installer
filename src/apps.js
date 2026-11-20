@@ -68,9 +68,9 @@ export const OFFICIAL_APPS = [
     blurb: "Scans documents to clean, searchable PDFs.",
     installPage: "https://flatbed.anonacondacodelab.com/android.html",
     release: {
-      version: "1.0.3",
-      file: "Flatbed-1.0.3.apk",
-      sha256: "2e8649b9c470b603a591feac1895c8990186f0f50a959fcd9404661d9a6d2674",
+      version: "1.0.4",
+      file: "Flatbed-1.0.4.apk",
+      sha256: "6b968c04ec93c6b18e989c27bd0cdbbe4553175cadf34ba4df45197eb7d86bba",
     },
   },
   {

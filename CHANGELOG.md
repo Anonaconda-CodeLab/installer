@@ -2,7 +2,8 @@
 
 ## 0.3.2
 
-- Lead One ECG updated to 1.8.5 (checksum from the release's `.sha256` file, studio certificate checked).
+- Lead One ECG updated to 1.8.5 and Flatbed to 1.0.4 (checksums from each release's `.sha256` file, studio certificate
+  checked).
 
 ## 0.3.1
 
